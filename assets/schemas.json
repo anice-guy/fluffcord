@@ -14848,6 +14848,7 @@
     },
     "ApplicationCommandOption": {
         "type": "object",
+        "additionalProperties": {},
         "properties": {
             "type": {
                 "$ref": "#/definitions/ApplicationCommandOptionType"
@@ -14906,10 +14907,10 @@
                 }
             },
             "min_value": {
-                "type": "integer"
+                "type": "number"
             },
             "max_value": {
-                "type": "integer"
+                "type": "number"
             },
             "min_length": {
                 "type": "integer"
@@ -14921,7 +14922,6 @@
                 "type": "boolean"
             }
         },
-        "additionalProperties": false,
         "required": [
             "description",
             "name",

@@ -49,3 +49,8 @@ export function validateSchema<G extends object>(schema: string, data: G): G {
     }
     return data;
 }
+
+/** Return property names declared on a generated schema */
+export function schemaPropertyNames(schema: string): string[] {
+    return Object.keys(schemas[schema]?.properties ?? {});
+}

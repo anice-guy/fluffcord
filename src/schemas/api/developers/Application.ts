@@ -18,11 +18,14 @@ export interface ApplicationCommandOption {
     choices?: ApplicationCommandOptionChoice[];
     options?: ApplicationCommandOption[];
     channel_types?: number[];
+    /** @TJS-type number */
     min_value?: number;
+    /** @TJS-type number */
     max_value?: number;
     min_length?: number;
     max_length?: number;
     autocomplete?: boolean;
+    [key: string]: unknown;
 }
 
 export interface ApplicationCommandOptionChoice {

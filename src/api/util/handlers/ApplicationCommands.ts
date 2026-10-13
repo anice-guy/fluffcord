@@ -2,7 +2,7 @@ import { Request, Response, Router } from "express";
 import { In, IsNull } from "typeorm";
 import { route } from "@spacebar/api/middlewares";
 import { Application, ApplicationAuthorization, ApplicationCommand, ApplicationCommandPermission, ApplicationCommandPermissionOverwrite, Member } from "@spacebar/database";
-import { ApplicationCommandCreateSchema, ApplicationCommandType } from "@spacebar/schemas";
+import { ApplicationCommandCreateSchema, ApplicationCommandType, ApplicationCommandOption, schemaPropertyNames } from "@spacebar/schemas";
 import { ApiError, DiscordApiErrors, emitEvent, FieldErrors, getPermission, Snowflake, UserApplicationUpdateEvent } from "@spacebar/util";
 
 const NAME_PATTERN = /^[-_'\p{L}\p{N}\p{sc=Deva}\p{sc=Thai}]{1,32}$/u;
@@ -78,6 +78,17 @@ function validate(body: ApplicationCommandCreateSchema, path = "") {
     return { type, name, description };
 }
 
+let optionKeys: string[] | undefined;
+
+function cleanOption(o: ApplicationCommandOption): ApplicationCommandOption {
+    // derived from the generated schema, so it follows the ApplicationCommandOption interface
+    optionKeys ??= schemaPropertyNames("ApplicationCommandOption");
+    const out: Record<string, unknown> = {};
+    for (const k of optionKeys) if (o[k] !== undefined) out[k] = o[k];
+    if (o.options) out.options = o.options.map(cleanOption);
+    return out as unknown as ApplicationCommandOption;
+}
+
 function apply(command: ApplicationCommand, body: ApplicationCommandCreateSchema, applicationId: string, guildId: string | undefined) {
     const { type, name, description } = validate({
         ...serializeIfExisting(command),
@@ -91,7 +102,7 @@ function apply(command: ApplicationCommand, body: ApplicationCommandCreateSchema
         description,
         name_localizations: body.name_localizations ?? command.name_localizations,
         description_localizations: body.description_localizations ?? command.description_localizations,
-        options: type === ApplicationCommandType.CHAT_INPUT ? (body.options ?? command.options ?? []) : [],
+        options: type === ApplicationCommandType.CHAT_INPUT ? (body.options ?? command.options ?? []).map(cleanOption) : [],
         default_member_permissions: body.default_member_permissions !== undefined ? (body.default_member_permissions ?? null) : (command.default_member_permissions ?? null),
         dm_permission: body.dm_permission ?? command.dm_permission ?? true,
         nsfw: body.nsfw ?? command.nsfw ?? false,

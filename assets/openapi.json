@@ -2113,6 +2113,12 @@
                     "activities": {
                         "type": "boolean"
                     },
+                    "members": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
                     "channels": {
                         "type": "object",
                         "additionalProperties": {
@@ -2131,12 +2137,6 @@
                     "typing": {
                         "const": true,
                         "type": "boolean"
-                    },
-                    "members": {
-                        "type": "array",
-                        "items": {
-                            "type": "string"
-                        }
                     },
                     "member_updates": {
                         "type": "boolean"
@@ -3798,16 +3798,16 @@
                     "icon": {
                         "type": "string"
                     },
-                    "channels": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/Channel"
-                        }
-                    },
                     "members": {
                         "type": "array",
                         "items": {
                             "$ref": "#/components/schemas/Member"
+                        }
+                    },
+                    "channels": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Channel"
                         }
                     },
                     "system_channel_id": {
@@ -4957,6 +4957,44 @@
                         "type": "string"
                     },
                     "gift_code_sku_id": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "login",
+                    "password"
+                ]
+            },
+            "AutomodAppealSchema": {
+                "type": "object",
+                "properties": {
+                    "login": {
+                        "type": "string"
+                    },
+                    "password": {
+                        "minLength": 1,
+                        "maxLength": 72,
+                        "type": "string"
+                    },
+                    "message": {
+                        "maxLength": 1000,
+                        "type": "string"
+                    },
+                    "ticket": {
+                        "type": "string"
+                    },
+                    "method": {
+                        "enum": [
+                            "backup",
+                            "totp",
+                            "webauthn"
+                        ],
+                        "type": "string"
+                    },
+                    "code": {
+                        "type": "string"
+                    },
+                    "appeal_ticket": {
                         "type": "string"
                     }
                 },
@@ -11008,6 +11046,23 @@
                     "ip"
                 ]
             },
+            "AdminIpBanLiftSchema": {
+                "type": "object",
+                "properties": {
+                    "ban_ids": {
+                        "description": "The address bans to lift, at most 100 per request. Each one also lifts the bans it spread.",
+                        "minItems": 1,
+                        "maxItems": 100,
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "required": [
+                    "ban_ids"
+                ]
+            },
             "AdminSessionsRevokeSchema": {
                 "type": "object",
                 "properties": {
@@ -11782,8 +11837,12 @@
                     "action": {
                         "enum": [
                             "delete",
+                            "disable",
+                            "hold",
+                            "log",
                             "name",
-                            "suspend"
+                            "suspend",
+                            "timeout"
                         ],
                         "type": "string"
                     },
@@ -11809,6 +11868,7 @@
                         "enum": [
                             "delete",
                             "disable",
+                            "hold",
                             "log",
                             "suspend",
                             "timeout"
@@ -11841,6 +11901,7 @@
                                 "enum": [
                                     "delete",
                                     "disable",
+                                    "hold",
                                     "log",
                                     "suspend",
                                     "timeout"
@@ -11880,6 +11941,7 @@
                                 "enum": [
                                     "delete",
                                     "disable",
+                                    "hold",
                                     "log",
                                     "suspend",
                                     "timeout"
@@ -11919,6 +11981,7 @@
                                 "enum": [
                                     "delete",
                                     "disable",
+                                    "hold",
                                     "log",
                                     "suspend",
                                     "timeout"
@@ -11963,6 +12026,7 @@
                                 "enum": [
                                     "delete",
                                     "disable",
+                                    "hold",
                                     "log",
                                     "suspend",
                                     "timeout"
@@ -12007,6 +12071,7 @@
                                 "enum": [
                                     "delete",
                                     "disable",
+                                    "hold",
                                     "log",
                                     "suspend",
                                     "timeout"
@@ -12046,6 +12111,7 @@
                                 "enum": [
                                     "delete",
                                     "disable",
+                                    "hold",
                                     "log",
                                     "suspend",
                                     "timeout"
@@ -12085,6 +12151,7 @@
                                 "enum": [
                                     "delete",
                                     "disable",
+                                    "hold",
                                     "log",
                                     "suspend",
                                     "timeout"
@@ -12129,6 +12196,7 @@
                                 "enum": [
                                     "delete",
                                     "disable",
+                                    "hold",
                                     "log",
                                     "suspend",
                                     "timeout"
@@ -12181,6 +12249,13 @@
                         "minimum": 1,
                         "maximum": 40320,
                         "type": "integer"
+                    },
+                    "ignoreLinkDomains": {
+                        "maxItems": 500,
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
                     },
                     "suspendHours": {
                         "minimum": 1,
@@ -12298,6 +12373,7 @@
                         "enum": [
                             "delete",
                             "disable",
+                            "hold",
                             "log",
                             "suspend",
                             "timeout"
@@ -12469,6 +12545,17 @@
                         "properties": {
                             "enabled": {
                                 "type": "boolean"
+                            },
+                            "action": {
+                                "enum": [
+                                    "delete",
+                                    "disable",
+                                    "hold",
+                                    "log",
+                                    "suspend",
+                                    "timeout"
+                                ],
+                                "type": "string"
                             },
                             "includeSoftA": {
                                 "type": "boolean"
@@ -12663,11 +12750,27 @@
                     "text"
                 ]
             },
+            "AdminAutomodAppealDecisionSchema": {
+                "type": "object",
+                "properties": {
+                    "decision": {
+                        "enum": [
+                            "accept",
+                            "deny"
+                        ],
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "decision"
+                ]
+            },
             "AdminAutomodReverseSchema": {
                 "type": "object",
                 "properties": {
                     "reversal": {
                         "enum": [
+                            "false_positive",
                             "not_a_match",
                             "undo"
                         ],
@@ -12677,6 +12780,56 @@
                 "required": [
                     "reversal"
                 ]
+            },
+            "AdminAutomodRulePolicySchema": {
+                "type": "object",
+                "properties": {
+                    "enabled": {
+                        "type": "boolean"
+                    },
+                    "action": {
+                        "enum": [
+                            "delete",
+                            "disable",
+                            "hold",
+                            "log",
+                            "suspend",
+                            "timeout"
+                        ],
+                        "type": "string"
+                    },
+                    "dryRun": {
+                        "type": "boolean"
+                    },
+                    "exemptStaff": {
+                        "type": "boolean"
+                    },
+                    "exemptBots": {
+                        "type": "boolean"
+                    },
+                    "exemptVerifiedEmail": {
+                        "type": "boolean"
+                    },
+                    "exemptAccountAgeDays": {
+                        "minimum": 0,
+                        "maximum": 3650,
+                        "type": "integer"
+                    },
+                    "exemptUserIds": {
+                        "maxItems": 500,
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "exemptGuildIds": {
+                        "maxItems": 500,
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                }
             },
             "AdminAutomodUsersSchema": {
                 "type": "object",
@@ -12760,6 +12913,13 @@
                         }
                     },
                     "contacts": {
+                        "maxItems": 10,
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "previousIds": {
                         "maxItems": 10,
                         "type": "array",
                         "items": {
@@ -13599,10 +13759,10 @@
                         }
                     },
                     "min_value": {
-                        "type": "integer"
+                        "type": "number"
                     },
                     "max_value": {
-                        "type": "integer"
+                        "type": "number"
                     },
                     "min_length": {
                         "type": "integer"
@@ -15669,6 +15829,42 @@
                     "federated_instance": {
                         "type": "string",
                         "nullable": true
+                    },
+                    "remote_badges": {
+                        "anyOf": [
+                            {
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id": {
+                                            "type": "string"
+                                        },
+                                        "kind": {
+                                            "type": "string"
+                                        },
+                                        "description": {
+                                            "type": "string"
+                                        },
+                                        "pride_flag": {
+                                            "type": "string"
+                                        },
+                                        "icon": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "description",
+                                        "id",
+                                        "kind"
+                                    ]
+                                }
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
                     },
                     "tag": {
                         "type": "string"
@@ -18766,6 +18962,12 @@
                     "about": {
                         "type": "string",
                         "nullable": true
+                    },
+                    "category_ids": {
+                        "type": "array",
+                        "items": {
+                            "type": "integer"
+                        }
                     }
                 },
                 "required": [
@@ -24723,6 +24925,9 @@
             "name": "api"
         },
         {
+            "name": "appeal"
+        },
+        {
             "name": "developers"
         },
         {
@@ -25115,7 +25320,7 @@
                         "bearer": []
                     }
                 ],
-                "description": "The automod log, newest first. Filter by `rule`, `action`, `user_id` or `reversed`. `review=yes` lists the last 24 hours of actions that did something and that nobody has undone or confirmed yet.",
+                "description": "The automod log, newest first. Filter by `rule`, `action`, `user_id`, `reversed`, `dry_run=yes` and `days`. `review=yes` lists the last 24 hours of actions that did something and that nobody has undone or confirmed yet.",
                 "responses": {
                     "default": {
                         "description": "No description available"
@@ -25163,6 +25368,23 @@
                             "type": "string"
                         },
                         "description": "yes"
+                    },
+                    {
+                        "name": "dry_run",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "yes"
+                    },
+                    {
+                        "name": "days",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "number"
+                        }
                     },
                     {
                         "name": "limit",
@@ -25261,6 +25483,104 @@
                             "type": "string"
                         },
                         "description": "action_id"
+                    }
+                ],
+                "tags": [
+                    "api"
+                ],
+                "x-badges": [
+                    {
+                        "label": "Spacebar-only",
+                        "color": "red"
+                    }
+                ]
+            }
+        },
+        "/api/admin/automod/appeals/": {
+            "get": {
+                "x-right-required": "VIEW_MODERATION",
+                "security": [
+                    {
+                        "bearer": []
+                    }
+                ],
+                "description": "Appeals from accounts that automod or a moderator suspended, held for review or disabled, newest first. `status` filters by pending, accepted or denied and defaults to pending. `still_restricted` says whether the restriction is still in place.",
+                "responses": {
+                    "default": {
+                        "description": "No description available"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "pending | accepted | denied | all"
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "number"
+                        }
+                    },
+                    {
+                        "name": "offset",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "number"
+                        }
+                    }
+                ],
+                "tags": [
+                    "api"
+                ],
+                "x-badges": [
+                    {
+                        "label": "Spacebar-only",
+                        "color": "red"
+                    }
+                ]
+            }
+        },
+        "/api/admin/automod/appeals/{appeal_id}/": {
+            "post": {
+                "x-right-required": "MODERATE_USERS",
+                "security": [
+                    {
+                        "bearer": []
+                    }
+                ],
+                "description": "Decide an appeal. `accept` lifts the restriction, marks the automod action behind it as a false positive and overturns its violation. `deny` keeps the restriction. The user sees the decision the next time they open the appeal page.",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/AdminAutomodAppealDecisionSchema"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "default": {
+                        "description": "No description available"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "appeal_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "appeal_id"
                     }
                 ],
                 "tags": [
@@ -25750,6 +26070,87 @@
                 ]
             }
         },
+        "/api/admin/automod/rules/": {
+            "get": {
+                "x-right-required": "VIEW_MODERATION",
+                "security": [
+                    {
+                        "bearer": []
+                    }
+                ],
+                "description": "Every automod rule with its switch, action, dry run and exemptions, and what it caught over the last `days` days (7 by default): hits, dry runs, confirmed hits and hits a moderator undid or marked as a false positive.",
+                "responses": {
+                    "default": {
+                        "description": "No description available"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "days",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "number"
+                        }
+                    }
+                ],
+                "tags": [
+                    "api"
+                ],
+                "x-badges": [
+                    {
+                        "label": "Spacebar-only",
+                        "color": "red"
+                    }
+                ]
+            }
+        },
+        "/api/admin/automod/rules/{rule_key}/": {
+            "patch": {
+                "x-right-required": "MANAGE_USERS",
+                "security": [
+                    {
+                        "bearer": []
+                    }
+                ],
+                "description": "Change one automod rule: its switch, its action where it has one, dry run, and who it skips. Lists replace the stored list. Thresholds stay in `PATCH /admin/automod/settings`.",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/AdminAutomodRulePolicySchema"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "default": {
+                        "description": "No description available"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "rule_key",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "rule_key"
+                    }
+                ],
+                "tags": [
+                    "api"
+                ],
+                "x-badges": [
+                    {
+                        "label": "Spacebar-only",
+                        "color": "red"
+                    }
+                ]
+            }
+        },
         "/api/admin/automod/scam-list/": {
             "get": {
                 "x-right-required": "VIEW_MODERATION",
@@ -25841,7 +26242,7 @@
                         "bearer": []
                     }
                 ],
-                "description": "Hits per rule over the last `days` days (30 by default), with how many a moderator undid, marked as not a match or confirmed. `false_positive_rate` is undone hits divided by reviewed hits, or null when nobody reviewed any.",
+                "description": "Hits per rule over the last `days` days (30 by default), with how many were dry runs and how many a moderator undid, marked as a false positive, marked as not a match or confirmed. `false_positive_rate` is undone hits divided by reviewed hits, or null when nobody reviewed any. `pending_appeals` counts appeals nobody has decided yet.",
                 "responses": {
                     "default": {
                         "description": "No description available"
@@ -26520,6 +26921,67 @@
                 ]
             }
         },
+        "/api/admin/federation/moves/": {
+            "get": {
+                "x-right-required": "OPERATOR",
+                "security": [
+                    {
+                        "bearer": []
+                    }
+                ],
+                "description": "Instance moves this instance learned of, from the registry or from the moved instance, with their state and what each one rewrote, and this instance's own previous ids and move statements.",
+                "responses": {
+                    "default": {
+                        "description": "No description available"
+                    }
+                },
+                "tags": [
+                    "api"
+                ],
+                "x-badges": [
+                    {
+                        "label": "Spacebar-only",
+                        "color": "red"
+                    }
+                ]
+            }
+        },
+        "/api/admin/federation/moves/{move_id}/": {
+            "post": {
+                "x-right-required": "OPERATOR",
+                "security": [
+                    {
+                        "bearer": []
+                    }
+                ],
+                "description": "Apply a move this instance couldn't confirm by itself, such as one where the instance changed its key, or run a move that stopped again. A move refused because the new id belongs to this instance or the registry still lists the old id stays refused.",
+                "responses": {
+                    "default": {
+                        "description": "No description available"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "move_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "move_id"
+                    }
+                ],
+                "tags": [
+                    "api"
+                ],
+                "x-badges": [
+                    {
+                        "label": "Spacebar-only",
+                        "color": "red"
+                    }
+                ]
+            }
+        },
         "/api/admin/federation/refresh/": {
             "post": {
                 "x-right-required": "OPERATOR",
@@ -26928,6 +27390,15 @@
                             "type": "string"
                         },
                         "description": "local (default) lists servers hosted here, remote lists mirrors of servers on other instances, all lists both. An exact id search ignores it"
+                    },
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "newest (default), oldest, name or members"
                     },
                     {
                         "name": "limit",
@@ -27572,13 +28043,31 @@
                         "bearer": []
                     }
                 ],
-                "description": "Instance bans on IP addresses, newest first",
+                "description": "Instance bans on IP addresses, newest first. `kind` is all, explicit for bans staff or a raid action made, or spread for bans that spread from another ban. `q` matches the start of an address. Each ban names the ban it spread from, the account it belongs to and how many bans it spread to.",
                 "responses": {
                     "default": {
                         "description": "No description available"
                     }
                 },
                 "parameters": [
+                    {
+                        "name": "kind",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "all | explicit | spread"
+                    },
+                    {
+                        "name": "q",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "The start of an address"
+                    },
                     {
                         "name": "limit",
                         "in": "query",
@@ -27620,6 +28109,41 @@
                         "application/json": {
                             "schema": {
                                 "$ref": "#/components/schemas/AdminIpBanCreateSchema"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "default": {
+                        "description": "No description available"
+                    }
+                },
+                "tags": [
+                    "api"
+                ],
+                "x-badges": [
+                    {
+                        "label": "Spacebar-only",
+                        "color": "red"
+                    }
+                ]
+            }
+        },
+        "/api/admin/ips/bans/lift/": {
+            "post": {
+                "x-right-required": "MODERATE_USERS",
+                "security": [
+                    {
+                        "bearer": []
+                    }
+                ],
+                "description": "Lift up to 100 IP bans at once, each together with the bans it spread. The response lists the lifted bans with their addresses and reasons, the ids that matched no address ban and how many spread bans went with them.",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/AdminIpBanLiftSchema"
                             }
                         }
                     }
@@ -29402,7 +29926,7 @@
                         "bearer": []
                     }
                 ],
-                "description": "Search users on this instance. `q` matches an exact id, an IP address, or part of a username, display name or email. `ip` lists the accounts that registered on or signed in from an address.",
+                "description": "Search users on this instance. `q` matches an exact id, an IP address, a handle such as `@name` or `name#1234`, or part of a username, display name or email. `ip` lists the accounts that registered on or signed in from an address.",
                 "responses": {
                     "default": {
                         "description": "No description available"
@@ -29443,6 +29967,15 @@
                             "type": "string"
                         },
                         "description": "local (default) lists accounts of this instance, remote lists users of other instances stored here, all lists both. An exact id search ignores it"
+                    },
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "newest (default), oldest or name"
                     },
                     {
                         "name": "limit",
@@ -33080,6 +33613,38 @@
                 },
                 "tags": [
                     "api"
+                ]
+            }
+        },
+        "/api/auth/appeal/": {
+            "post": {
+                "security": [
+                    {}
+                ],
+                "description": "For an account that can't sign in because it is suspended, held for review or disabled. With the account's login and password it returns why, and with `message` it sends one appeal for the current restriction to the moderators' queue.",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/AutomodAppealSchema"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "default": {
+                        "description": "No description available"
+                    }
+                },
+                "tags": [
+                    "api"
+                ],
+                "x-badges": [
+                    {
+                        "label": "Spacebar-only",
+                        "color": "red"
+                    }
                 ]
             }
         },
@@ -38186,6 +38751,35 @@
                 ]
             }
         },
+        "/api/federation/discovery/guilds/{guild_id}/": {
+            "get": {
+                "security": [
+                    {
+                        "bearer": []
+                    }
+                ],
+                "description": "One server from the Other instances directory with its welcome screen, read from this instance's cached listings so the browser never contacts the other instance",
+                "responses": {
+                    "default": {
+                        "description": "No description available"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "guild_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "guild_id"
+                    }
+                ],
+                "tags": [
+                    "api"
+                ]
+            }
+        },
         "/api/federation/discovery/": {
             "get": {
                 "security": [
@@ -38193,12 +38787,61 @@
                         "bearer": []
                     }
                 ],
-                "description": "Other instances from the registry and the servers they list for global discovery, with icons through this instance's media proxy",
+                "description": "Other instances from the registry and a page of the servers they list for global discovery, searched by name, keywords and description from the cached listings, with icons through this instance's media proxy",
                 "responses": {
                     "default": {
                         "description": "No description available"
                     }
                 },
+                "parameters": [
+                    {
+                        "name": "query",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Words that must each start a word in the name, description or keywords"
+                    },
+                    {
+                        "name": "category_id",
+                        "in": "query",
+                        "schema": {
+                            "type": "number"
+                        },
+                        "description": "Only servers in this primary or secondary category"
+                    },
+                    {
+                        "name": "instance",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Only servers on this instance id"
+                    },
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "relevance (default), active, members or newest"
+                    },
+                    {
+                        "name": "offset",
+                        "in": "query",
+                        "schema": {
+                            "type": "number"
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "schema": {
+                            "type": "number"
+                        },
+                        "description": "24 by default, 48 at most"
+                    }
+                ],
                 "tags": [
                     "api"
                 ]
@@ -38279,6 +38922,30 @@
                         "description": "code"
                     }
                 ],
+                "tags": [
+                    "api"
+                ],
+                "x-badges": [
+                    {
+                        "label": "Spacebar-only",
+                        "color": "red"
+                    }
+                ]
+            }
+        },
+        "/api/federation/moves/": {
+            "get": {
+                "security": [
+                    {
+                        "bearer": []
+                    }
+                ],
+                "description": "Instance ids that changed. previous lists the ids this instance had before, and moved maps each old id of another instance to its current id. Clients use it to check end-to-end encrypted messages sent before a move.",
+                "responses": {
+                    "default": {
+                        "description": "No description available"
+                    }
+                },
                 "tags": [
                     "api"
                 ],
@@ -40784,6 +41451,82 @@
                             "type": "string"
                         },
                         "description": "guild_id"
+                    }
+                ],
+                "tags": [
+                    "api"
+                ]
+            }
+        },
+        "/api/guilds/{guild_id}/discovery-categories/{category_id}/": {
+            "put": {
+                "x-permission-required": "MANAGE_GUILD",
+                "security": [
+                    {
+                        "bearer": []
+                    }
+                ],
+                "description": "Add a secondary discovery category to the server",
+                "responses": {
+                    "default": {
+                        "description": "No description available"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "guild_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "guild_id"
+                    },
+                    {
+                        "name": "category_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "category_id"
+                    }
+                ],
+                "tags": [
+                    "api"
+                ]
+            },
+            "delete": {
+                "x-permission-required": "MANAGE_GUILD",
+                "security": [
+                    {
+                        "bearer": []
+                    }
+                ],
+                "description": "Remove a secondary discovery category from the server",
+                "responses": {
+                    "default": {
+                        "description": "No description available"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "guild_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "guild_id"
+                    },
+                    {
+                        "name": "category_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "category_id"
                     }
                 ],
                 "tags": [
@@ -54121,6 +54864,41 @@
                 ]
             }
         },
+        "/api/users/{user_id}/remote-badges/": {
+            "get": {
+                "security": [
+                    {
+                        "bearer": []
+                    }
+                ],
+                "description": "The badges a user's home instance gave them, for users from other instances. They are shown apart from this instance's badges, and staff badges come without their icon.",
+                "responses": {
+                    "default": {
+                        "description": "No description available"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "user_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "user_id"
+                    }
+                ],
+                "tags": [
+                    "api"
+                ],
+                "x-badges": [
+                    {
+                        "label": "Spacebar-only",
+                        "color": "red"
+                    }
+                ]
+            }
+        },
         "/api/voice/regions/": {
             "get": {
                 "security": [
@@ -55313,6 +56091,27 @@
                 ]
             }
         },
+        "/appeal/": {
+            "get": {
+                "security": [
+                    {}
+                ],
+                "responses": {
+                    "default": {
+                        "description": "No description available"
+                    }
+                },
+                "tags": [
+                    "appeal"
+                ],
+                "x-badges": [
+                    {
+                        "label": "Spacebar-only",
+                        "color": "red"
+                    }
+                ]
+            }
+        },
         "/developers/docs{/*splat}": {
             "get": {
                 "security": [
@@ -55431,6 +56230,28 @@
                     {}
                 ],
                 "description": "Join a remote user to a server through an invite and answer the server snapshot. Needs a signed request.",
+                "responses": {
+                    "default": {
+                        "description": "No description available"
+                    }
+                },
+                "tags": [
+                    "federation"
+                ],
+                "x-badges": [
+                    {
+                        "label": "Spacebar-only",
+                        "color": "red"
+                    }
+                ]
+            }
+        },
+        "/federation/v2/move/": {
+            "post": {
+                "security": [
+                    {}
+                ],
+                "description": "An instance that changed its id tells this instance about it. The body carries a move statement signed with the key the old id had, and the request is signed with the key the new id serves.",
                 "responses": {
                     "default": {
                         "description": "No description available"

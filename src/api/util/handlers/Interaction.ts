@@ -394,11 +394,20 @@ export async function editInteractionMessage(
     }
     if (data.poll !== undefined) message.poll = data.poll as never;
     if (data.flags !== undefined) message.flags = (message.flags & (EPHEMERAL | LOADING | COMPONENTS_V2)) | (data.flags & SETTABLE_FLAGS & ~EPHEMERAL);
-    if (data.attachments !== undefined && data.attachments.length === 0) message.attachments = [];
+    // if (data.attachments !== undefined && data.attachments.length === 0) message.attachments = [];
+    const uploaded = (data.attachments ?? []) as unknown as Attachment[];
+    if (data.attachments !== undefined) {
+        if (uploaded.length === 0) message.attachments = [];
+        else {
+            for (const a of uploaded) a.message_id = message.id;
+            message.attachments = [...(message.attachments ?? []), ...uploaded];
+        }
+    }
 
     message.flags &= ~LOADING;
     if (!wasLoading) message.edited_timestamp = new Date();
     await message.save();
+    if (uploaded.length) await Promise.all(uploaded.map((a) => a.save()));
     await emitToAudience(message, "MESSAGE_UPDATE", interaction.userId);
     if (data.components && !(message.flags & EPHEMERAL)) fillComponentMedia(message).catch((e) => console.error("[Interaction] component media unfurl failed", e));
     return message;

@@ -394,7 +394,6 @@ export async function editInteractionMessage(
     }
     if (data.poll !== undefined) message.poll = data.poll as never;
     if (data.flags !== undefined) message.flags = (message.flags & (EPHEMERAL | LOADING | COMPONENTS_V2)) | (data.flags & SETTABLE_FLAGS & ~EPHEMERAL);
-    // if (data.attachments !== undefined && data.attachments.length === 0) message.attachments = [];
     const uploaded = (data.attachments ?? []) as unknown as Attachment[];
     if (data.attachments !== undefined) {
         if (uploaded.length === 0) message.attachments = [];

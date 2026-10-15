@@ -29,7 +29,14 @@ router.post(
 
             if (!req.file) throw new HTTPError("file missing");
 
-            const { buffer, mimetype, size, originalname } = req.file;
+            // const { buffer, mimetype, size, originalname } = req.file;
+            const { buffer, size, originalname } = req.file;
+            let mimetype = req.file.mimetype;
+            // clients like Oceanic upload everything as octet-stream, so detect the real type from the bytes
+            if (!mimetype || mimetype === "application/octet-stream") {
+                mimetype = (await fileTypeFromBuffer(buffer))?.mime ?? mimetype ?? "application/octet-stream";
+            }
+
             const { channel_id, message_id } = req.params as { [key: string]: string };
             const filename = originalname.replaceAll(" ", "_").replace(/[^a-zA-Z0-9._-]+/g, "");
             const attachment_id = Snowflake.generate();
@@ -80,7 +87,7 @@ router.get("/:channel_id/:attachment_id/:filename", setCacheControl, async (req:
 
     const path = `attachments/${channel_id}/${attachment_id}/${filename}`;
 
-    const fullUrl = (req.headers["x-forwarded-proto"] ?? req.protocol) + "://" + (req.headers["x-forwarded-host"] ?? req.hostname) + req.originalUrl;
+    const fullUrl = `${req.headers["x-forwarded-proto"] ?? req.protocol}://${req.headers["x-forwarded-host"] ?? req.hostname}${req.originalUrl}`;
 
     let hasValidAuth = false;
     if (req.headers.signature) {
@@ -231,7 +238,7 @@ router.put(
                         userFilename: filename,
                     },
                 });
-                if (!att || !att.userId) throw new HTTPError("Attachment not found", 404);
+                if (!att?.userId) throw new HTTPError("Attachment not found", 404);
                 if (buffer.length > declaredCloudUploadLimit(att)) throw new HTTPError("File too large", 413);
 
                 const path = `attachments/${channel_id}/${batch_id}/${attachment_id}/${filename}`;

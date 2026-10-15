@@ -615,7 +615,7 @@ export class Message extends BaseClass {
     }
     static addDefault(options: FindOneOptions<Message>) {
         if (options.where) {
-            const arr = options.where instanceof Array ? options.where : [options.where];
+            const arr = Array.isArray(options.where) ? options.where : [options.where];
             for (const thing of arr) {
                 if (!("flags" in thing)) {
                     thing.flags = Not(Raw((alias) => `${alias} & ${MessageFlags.FLAGS.EPHEMERAL} = ${MessageFlags.FLAGS.EPHEMERAL}`));

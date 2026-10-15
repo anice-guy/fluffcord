@@ -451,7 +451,7 @@ export class Message extends BaseClass {
             content: this.content ?? "",
             embeds: (this.embeds ?? []).map((embed) => proxyEmbedMedia({ ...embed, type: embed.type || EmbedType.rich })),
             pinned: this.pinned,
-            thread: this.thread ? this.thread.toJSON() : this.thread,
+            thread: this.thread ? this.thread.toJSON() : undefined,
             referenced_message: shallow ? undefined : this.referenced_message === null ? null : this.referenced_message?.toJSON(this.type !== MessageType.THREAD_STARTER_MESSAGE),
             encrypted: this.encrypted ?? undefined,
             soundboard_sounds: this.soundboard_sounds?.length ? this.soundboard_sounds : undefined,
